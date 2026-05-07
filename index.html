@@ -132,7 +132,7 @@
       font-weight: 800; 
       text-transform: uppercase; 
       letter-spacing: 0.15em; 
-      background: linear-gradient(90deg, #fff, var(--text-muted), #fff);
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary), #61d8ff, var(--accent));
       background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -354,26 +354,111 @@
     .feature-card:hover { transform: translateY(-12px); background: rgba(255,255,255,0.06); border-color: var(--accent); }
     .feature-icon { font-size: 32px; color: var(--accent); margin-bottom: 24px; }
 
-    /* Neural Orb */
-    .neural-orb {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .sidebar {
       width: 80px;
-      height: 80px;
-      background: conic-gradient(from 180deg, var(--accent), var(--accent-secondary), #61d8ff, var(--accent));
-      border-radius: 50%;
+      background: rgba(10, 12, 10, 0.5);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 100px 0 40px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 900;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sidebar:hover { width: 200px; }
+    .sidebar:hover ~ .main-content { margin-left: 200px; }
+
+    .side-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      width: 100%;
+      padding: 0 16px;
+    }
+    .side-link {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 0 30px var(--accent-glow);
-      animation: float 6s ease-in-out infinite;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: 0.3s;
+      overflow: hidden;
+      white-space: nowrap;
+      gap: 16px;
+    }
+    .side-link span.material-icons { font-size: 24px; }
+    .side-link span.label { display: none; font-size: 14px; font-weight: 600; }
+    .sidebar:hover .side-link { justify-content: flex-start; padding-left: 16px; }
+    .sidebar:hover .side-link span.label { display: block; }
+    .side-link:hover, .side-link.active {
+      background: rgba(180, 255, 79, 0.1);
+      color: var(--accent);
+      box-shadow: 0 0 20px rgba(180, 255, 79, 0.1);
     }
 
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    .main-content {
+      flex: 1;
+      margin-left: 80px;
+      padding-top: 100px;
+      transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 3D UI Graphic Section */
+    .app-preview-section {
+      position: relative;
+      padding: 120px 0;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 100%, rgba(180, 255, 79, 0.05), transparent 800px);
+    }
+    .preview-3d-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      perspective: 2000px;
+      position: relative;
+    }
+    .preview-image {
+      width: 100%;
+      height: auto;
+      border-radius: 40px;
+      box-shadow: 0 50px 100px rgba(0,0,0,0.6), 0 0 80px var(--accent-glow);
+      transform: rotateX(15deg) rotateY(-5deg) translateY(40px);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid var(--glass-border);
+      opacity: 0.9;
+    }
+    .preview-3d-container:hover .preview-image {
+      transform: rotateX(5deg) rotateY(0deg) translateY(0);
+      opacity: 1;
+    }
+    .preview-badge {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-weight: 800;
+      font-size: 14px;
+      box-shadow: 0 10px 30px var(--accent-glow);
+      z-index: 10;
+    }
 
     /* Status Console */
     .status-console {
@@ -431,6 +516,70 @@
     .file-upload-label span:not(.material-icons) { font-size: 14px; font-weight: 500; color: var(--text-muted); transition: 0.3s; }
     #voiceFile { opacity: 0; position: absolute; inset: 0; cursor: pointer; z-index: 10; }
 
+    /* Neural Insights */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+    .insight-card {
+      background: var(--surface-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .insight-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--accent);
+    }
+    .insight-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .insight-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .insight-value { font-size: 32px; font-weight: 800; color: var(--text-main); }
+    .insight-chart {
+      height: 60px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      margin-top: 20px;
+    }
+    .chart-bar {
+      flex: 1;
+      background: rgba(180, 255, 79, 0.2);
+      border-radius: 4px;
+      transition: height 1s ease;
+    }
+    .chart-bar.active { background: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+
+    /* History Log */
+    .history-panel {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-top: 32px;
+    }
+    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .history-list { display: flex; flex-direction: column; gap: 12px; max-height: 200px; overflow-y: auto; scrollbar-width: none; }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      font-size: 13px;
+      border: 1px solid transparent;
+      transition: 0.3s;
+    }
+    .history-item:hover { border-color: var(--accent); background: rgba(180, 255, 79, 0.05); }
+    .history-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%; }
+    .history-lang { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; }
+
     .footer {
       padding: 60px 0 40px;
       border-top: 1px solid var(--glass-border);
@@ -482,23 +631,23 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: #000;
-      border: 1px solid var(--glass-border);
-      padding: 8px 18px;
-      border-radius: 50px;
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 10px 24px;
+      border-radius: 100px;
       color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 400;
+      font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
       transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       font-family: inherit;
     }
     .copyright-btn:hover {
-      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.03);
+      border-color: var(--glass-border);
       color: var(--accent);
-      box-shadow: 0 0 30px var(--accent-glow);
-      transform: translateY(-2px);
-      background: rgba(180, 255, 79, 0.05);
+      box-shadow: 0 0 40px var(--accent-glow);
+      transform: translateY(-3px) scale(1.02);
     }
 
     /* Neural Metrics */
@@ -549,10 +698,36 @@
     }
   </style>
 </head>
-<body>
-  <canvas id="auroraCanvas"></canvas>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <nav class="side-nav">
+        <a href="#translateStudio" class="side-link active">
+          <span class="material-icons">translate</span>
+          <span class="label">Translate</span>
+        </a>
+        <a href="#voiceStudio" class="side-link">
+          <span class="material-icons">mic</span>
+          <span class="label">Voice Studio</span>
+        </a>
+        <a href="#features" class="side-link">
+          <span class="material-icons">auto_awesome</span>
+          <span class="label">Features</span>
+        </a>
+        <a href="#network" class="side-link">
+          <span class="material-icons">public</span>
+          <span class="label">Network</span>
+        </a>
+        <div style="margin-top: auto; padding: 20px 0; border-top: 1px solid var(--glass-border); width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+          <a href="#" class="side-link">
+            <span class="material-icons">settings</span>
+            <span class="label">Settings</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
 
-  <header class="topbar">
+    <div class="main-content">
+      <header class="topbar">
     <div class="brand-container">
       <div class="brand-dot"></div>
       <div class="brand-text">VOCALIX</div>
@@ -599,6 +774,41 @@
       </div>
     </section>
 
+    <section id="insights" class="reveal" style="margin-bottom: 80px;">
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-header">
+            <span class="insight-title">Neural Engine Load</span>
+            <span class="material-icons" style="color:var(--accent); font-size:18px;">analytics</span>
+          </div>
+          <div class="insight-value" id="statNeuralLoad">24%</div>
+          <div class="insight-chart" id="neuralLoadChart">
+            <div class="chart-bar" style="height:30%"></div>
+            <div class="chart-bar" style="height:45%"></div>
+            <div class="chart-bar active" style="height:24%"></div>
+            <div class="chart-bar" style="height:35%"></div>
+            <div class="chart-bar" style="height:50%"></div>
+          </div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-header">
+            <span class="insight-title">Global Sync Status</span>
+            <span class="material-icons" style="color:var(--accent-secondary); font-size:18px;">sync_alt</span>
+          </div>
+          <div class="insight-value" id="statSync">99.2%</div>
+          <p style="font-size:11px; color:var(--text-muted); margin-top:10px;">Distributed Mesh Network Active</p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-header">
+            <span class="insight-title">Active Neural Nodes</span>
+            <span class="material-icons" style="color:#61d8ff; font-size:18px;">hub</span>
+          </div>
+          <div class="insight-value" id="statNodes">142</div>
+          <p style="font-size:11px; color:var(--text-muted); margin-top:10px;">Global Lattice Coverage Optimized</p>
+        </div>
+      </div>
+    </section>
+
     <section id="translateStudio" class="product-shell reveal">
       <div class="layout">
         <!-- Text Panel -->
@@ -638,6 +848,16 @@
           <div id="textAudioContainer" style="display:none; margin-top:24px;">
              <button id="playTextBtn" class="btn btn-secondary" onclick="playCustomAudio('textAudio', 'playTextBtn')" style="width:100%; justify-content:center;">▶️ Play Audio</button>
              <audio id="textAudio"></audio>
+          </div>
+
+          <div class="history-panel">
+            <div class="history-header">
+              <label style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Neural History</label>
+              <span class="material-icons" style="font-size:14px; color:var(--text-muted); cursor:pointer;" onclick="clearHistory()">delete_sweep</span>
+            </div>
+            <div class="history-list" id="historyList">
+              <div class="history-item"><span class="history-text">No recent activity</span></div>
+            </div>
           </div>
         </div>
 
@@ -713,7 +933,7 @@
       </div>
     </section>
 
-    <section class="network-map reveal">
+    <section id="network" class="network-map reveal">
       <h2>Global Communication Network</h2>
       <p style="max-width: 600px; margin: 0 auto; color: var(--text-muted);">Vocalix connects millions of speakers worldwide through a distributed neural mesh network, ensuring instant translation anywhere on Earth.</p>
       
@@ -737,6 +957,13 @@
       </div>
     </section>
 
+    <section class="app-preview-section reveal">
+      <div class="preview-3d-container">
+        <div class="preview-badge">VOCALIX PRO INTERFACE</div>
+        <img src="vocalix_preview.png" alt="Vocalix 3D UI" class="preview-image">
+      </div>
+    </section>
+
     <footer class="footer reveal">
       <div class="crafted-badge">
         Crafted by <span class="crafted-name">Mihir</span>
@@ -751,10 +978,7 @@
         <span>Copyright © 2026 Vocalix. All rights reserved.</span>
       </button>
     </footer>
-  </main>
-
-  <div class="neural-orb" onclick="handleOrbClick()">
-    🧬
+    </div>
   </div>
 
   <script>
@@ -1049,6 +1273,10 @@
         
         showResult("textResult", data.translated_text);
         if (data.audio_base64) setCustomAudio("textAudioContainer", "textAudio", data.audio_base64);
+        
+        // Add to history
+        addToHistory(text, data.translated_text, target_lang);
+        
         setTimeout(() => { document.getElementById("textConsole").style.display = "none"; }, 2000);
       } catch (err) {
         showResult("textResult", err.message, true);
@@ -1127,9 +1355,6 @@
       return new Blob([view], { type: 'audio/wav' });
     }
 
-    function handleOrbClick() {
-      alert("Neural Core Synchronized.");
-    }
 
     let audioContext, analyser, dataArray, animationId;
     async function startRealTimeMonitor() {
@@ -1250,6 +1475,10 @@
     document.addEventListener("DOMContentLoaded", () => {
       startAuroraCanvas();
       loadLanguages();
+      updateSystemStats();
+      setInterval(updateSystemStats, 5000);
+      loadHistory();
+      
       document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
       
       fetch(`${apiBase}/languages`).then(res => {
@@ -1260,6 +1489,58 @@
         status.innerHTML = '<span class="status-dot" style="background:#ef4444;"></span> OFFLINE';
       });
     });
+
+    function addToHistory(input, result, lang) {
+      let history = JSON.parse(localStorage.getItem('vocalix_history') || '[]');
+      history.unshift({ input, result, lang, time: new Date().getTime() });
+      if(history.length > 10) history.pop();
+      localStorage.setItem('vocalix_history', JSON.stringify(history));
+      loadHistory();
+    }
+
+    function loadHistory() {
+      const list = document.getElementById("historyList");
+      const history = JSON.parse(localStorage.getItem('vocalix_history') || '[]');
+      if(history.length === 0) {
+        list.innerHTML = '<div class="history-item"><span class="history-text">No recent activity</span></div>';
+        return;
+      }
+      list.innerHTML = history.map(h => `
+        <div class="history-item" onclick="document.getElementById('textInput').value='${h.input.replace(/'/g, "\\'")}'; translateText();">
+          <span class="history-text">${h.input}</span>
+          <span class="history-lang">${h.lang}</span>
+        </div>
+      `).join("");
+    }
+
+    function clearHistory() {
+      localStorage.removeItem('vocalix_history');
+      loadHistory();
+    }
+
+    async function updateSystemStats() {
+      try {
+        const res = await fetch(`${apiBase}/system-status`);
+        const data = await res.json();
+        
+        document.getElementById("statNeuralLoad").innerText = `${data.neural_load}%`;
+        document.getElementById("statSync").innerText = `${data.memory_sync}%`;
+        document.getElementById("statNodes").innerText = data.active_nodes;
+        
+        // Update Chart
+        const chart = document.getElementById("neuralLoadChart");
+        const bars = chart.querySelectorAll(".chart-bar");
+        bars.forEach((bar, i) => {
+          if (i < bars.length - 1) {
+            bar.style.height = bars[i+1].style.height;
+            bar.classList.remove("active");
+          } else {
+            bar.style.height = `${data.neural_load}%`;
+            bar.classList.add("active");
+          }
+        });
+      } catch(e) {}
+    }
   </script>
 </body>
 </html>
