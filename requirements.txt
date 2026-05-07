@@ -1,0 +1,9 @@
+fastapi==0.117.1
+uvicorn==0.37.0
+speechrecognition==3.14.3
+deep-translator==1.11.4
+edge-tts>=6.1.9
+python-multipart==0.0.20
+langdetect==1.0.9
+pydub==0.25.1
+gTTS==2.5.4

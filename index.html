@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vocalix | Advanced AI Neural Translator</title>
+  
+  <meta property="og:title" content="Vocalix | Advanced AI Neural Translator" />
+  <meta property="og:description" content="Experience the next generation of seamless communication with Vocalix. Neural-powered voice and text translation." />
+  <meta name="theme-color" content="#050608" />
+  
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #050608;
+      --accent: #b4ff4f; /* Lime */
+      --accent-secondary: #62f2b6; /* Mint */
+      --accent-glow: rgba(180, 255, 79, 0.4);
+      --glass: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f7f3e9;
+      --text-muted: rgba(247, 243, 233, 0.6);
+      --surface-card: rgba(12, 14, 12, 0.85);
+      --font-display: 'Outfit', sans-serif;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-display);
+    }
+
+    body {
+      overflow-x: hidden;
+      line-height: 1.6;
+      background: 
+        radial-gradient(circle at 50% -10%, rgba(180, 255, 79, 0.12), transparent 800px),
+        var(--bg-dark);
+    }
+
+    /* Scroll Reveal Animation Classes */
+    .reveal {
+      opacity: 0;
+      transform: translateY(60px) scale(0.96);
+      transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-left.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(60px);
+      transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-right.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Aurora Background Canvas */
+    #auroraCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.3;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Topbar */
+    .topbar {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 48px);
+      max-width: 1100px;
+      height: 68px;
+      background: rgba(10, 12, 10, 0.7);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 1000;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .brand-container { display: flex; align-items: center; gap: 12px; }
+    .brand-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg, var(--accent), var(--accent-secondary), #61d8ff, var(--accent));
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .brand-text { font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 13px; font-weight: 700; transition: 0.3s; }
+    .nav-links a:hover { color: var(--accent); }
+
+    .server-online {
+      background: #f7f3e9;
+      color: #050608;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 10px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.3s;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #000; }
+
+    /* Hero */
+    .hero {
+      padding: 220px 0 120px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .eyebrow {
+      background: rgba(180, 255, 79, 0.08);
+      border: 1px solid rgba(180, 255, 79, 0.15);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+    .hero h1 {
+      font-size: clamp(54px, 10vw, 160px);
+      line-height: 0.85;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 32px;
+      text-wrap: balance;
+    }
+    .hero h1 span { color: var(--text-main); display: block; }
+    .hero p {
+      max-width: 680px;
+      font-size: clamp(18px, 2vw, 24px);
+      color: var(--text-muted);
+      margin-bottom: 48px;
+    }
+
+    .btn {
+      padding: 18px 36px;
+      border-radius: 100px;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-primary { background: #f7f3e9; color: #050608; box-shadow: 0 20px 60px rgba(247, 243, 233, 0.15); }
+    .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 30px 80px rgba(247, 243, 233, 0.25); }
+    .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); transform: translateY(-4px); }
+
+    /* Product Shell */
+    .product-shell {
+      background: var(--surface-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 32px;
+      padding: 48px;
+      margin-bottom: 120px;
+      box-shadow: 0 100px 200px rgba(0,0,0,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    .product-shell::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .panel {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .panel:hover { border-color: var(--accent); }
+
+    /* Form UI */
+    .field label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 0.1em; }
+    
+    /* Custom Select */
+    .custom-select-wrapper { position: relative; width: 100%; }
+    .custom-select {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      padding: 16px 20px;
+      border-radius: 16px;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.3s;
+    }
+    .custom-select:hover, .custom-select.active { border-color: var(--accent); background: rgba(255,255,255,0.08); }
+    
+    .custom-options {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: #0c0e0c;
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      padding: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .custom-options.show { display: block; animation: revealUp 0.3s ease; }
+    .custom-option {
+      padding: 12px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 14px;
+    }
+    .custom-option:hover { background: rgba(180, 255, 79, 0.1); color: var(--accent); }
+    .custom-option.selected { background: var(--accent); color: #000; font-weight: 700; }
+
+    .hidden-select { display: none; }
+
+    .textarea-wrapper {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 2px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+    .textarea-wrapper.typing { box-shadow: 0 0 40px var(--accent-glow); border-color: var(--accent); }
+    .textarea-inner { background: #0c0e0c; border-radius: 18px; padding: 20px; }
+    textarea { width: 100%; background: transparent; border: none; color: #fff; font-size: 16px; font-family: inherit; outline: none; min-height: 200px; resize: none; line-height: 1.6; }
+    
+    .result-box {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 24px;
+      font-size: 16px;
+      color: var(--text-main);
+      min-height: 120px;
+      margin-top: 24px;
+      display: none;
+      line-height: 1.6;
+    }
+    .result-box.show { display: block; animation: revealUp 0.6s ease forwards; }
+
+    /* Features Section */
+    .features { padding: 120px 0; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .feature-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 48px;
+      transition: 0.4s;
+    }
+    .feature-card:hover { transform: translateY(-12px); background: rgba(255,255,255,0.06); border-color: var(--accent); }
+    .feature-icon { font-size: 32px; color: var(--accent); margin-bottom: 24px; }
+
+    /* Neural Orb */
+    .neural-orb {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      width: 80px;
+      height: 80px;
+      background: conic-gradient(from 180deg, var(--accent), var(--accent-secondary), #61d8ff, var(--accent));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 0 30px var(--accent-glow);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+    /* Status Console */
+    .status-console {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--accent-secondary);
+      display: none;
+      margin-bottom: 16px;
+    }
+    .status-line { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .status-dot-mini { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+    /* Hints */
+    .hint-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 8px 0; scrollbar-width: none; }
+    .hint-scroll::-webkit-scrollbar { display: none; }
+    .hint-chip { background: var(--glass); border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 50px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+    .hint-chip:hover { border-color: var(--accent); background: rgba(255,255,255,0.08); }
+
+    /* Audio Waves */
+    .pulse-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin: 20px 0; justify-content: center; }
+    .pulse-bar { flex: 0 0 8px; background: var(--accent); border-radius: 10px; min-height: 6px; transition: 0.1s; }
+
+    /* File Upload */
+    .file-upload-label {
+      background: var(--glass);
+      border: 1px dashed var(--glass-border);
+      padding: 40px;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+      width: 100%;
+    }
+    .file-upload-label:hover { border-color: var(--accent); background: rgba(255,255,255,0.08); }
+    .file-upload-label span.material-icons { font-size: 48px; color: var(--accent); }
+
+    .footer {
+      padding: 80px 0;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .crafted-badge { font-weight: 700; font-size: 14px; }
+    .crafted-badge span { color: var(--accent); }
+
+    @keyframes revealUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 1024px) {
+      .layout { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 72px; }
+      .product-shell { padding: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="auroraCanvas"></canvas>
+
+  <header class="topbar">
+    <div class="brand-container">
+      <div class="brand-dot"></div>
+      <div class="brand-text">VOCALIX</div>
+    </div>
+    <nav class="nav-links">
+      <a href="#translateStudio">TRANSLATE</a>
+      <a href="#voiceStudio">VOICE</a>
+      <a href="#features">FEATURES</a>
+    </nav>
+    <div class="server-online">
+      <div class="status-dot"></div>
+      SERVER ONLINE
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero reveal">
+      <div class="eyebrow">Advanced AI Neural Translator</div>
+      <h1>Your Words,<span>Redefined.</span></h1>
+      <p>Experience seamless cross-lingual communication with real-time neural processing and cinematic voice synthesis.</p>
+      <div class="hero-actions">
+        <a href="#translateStudio" class="btn btn-primary">Start Translating</a>
+        <a href="#features" class="btn btn-secondary">Learn More</a>
+      </div>
+    </section>
+
+    <section id="translateStudio" class="product-shell reveal">
+      <div class="layout">
+        <!-- Text Panel -->
+        <div class="panel reveal-left">
+          <div class="field">
+            <label>Neural Core Input</label>
+            <div id="textConsole" class="status-console"></div>
+            <div class="textarea-wrapper">
+              <div class="textarea-inner">
+                <textarea id="textInput" placeholder="Enter text to translate..."></textarea>
+                <div id="wordCounter" style="font-size:10px; color:var(--text-muted); text-align:right; margin-top:8px;">0 words</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hint-section">
+            <div class="field"><label id="hintTitle">💡 Quick Suggestions</label></div>
+            <div class="hint-scroll" id="hintScroll"></div>
+          </div>
+
+          <div class="layout" style="grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="field">
+              <label>Source Language</label>
+              <select id="textSource" class="hidden-select">
+                <option value="auto">Auto Detect</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Target Language</label>
+              <select id="textTarget" class="hidden-select"></select>
+            </div>
+          </div>
+
+          <button id="textTranslateBtn" class="btn btn-primary" onclick="translateText()" style="width:100%; justify-content:center;">Translate Now</button>
+          
+          <div id="textResult" class="result-box"></div>
+          <div id="textAudioContainer" style="display:none; margin-top:24px;">
+             <button id="playTextBtn" class="btn btn-secondary" onclick="playCustomAudio('textAudio', 'playTextBtn')" style="width:100%; justify-content:center;">▶️ Play Audio</button>
+             <audio id="textAudio"></audio>
+          </div>
+        </div>
+
+        <!-- Voice Panel -->
+        <div id="voiceStudio" class="panel reveal-right">
+          <div class="field">
+            <label>Vocal Pulse Spectrum</label>
+            <div id="voiceConsole" class="status-console"></div>
+            <div class="vocal-pulse-container">
+              <div class="pulse-bars" id="neuralBars">
+                <div class="pulse-bar"></div><div class="pulse-bar"></div><div class="pulse-bar"></div><div class="pulse-bar"></div>
+                <div class="pulse-bar"></div><div class="pulse-bar"></div><div class="pulse-bar"></div><div class="pulse-bar"></div>
+                <div class="pulse-bar"></div><div class="pulse-bar"></div><div class="pulse-bar"></div><div class="pulse-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Audio Capture</label>
+            <div style="display:flex; flex-direction:column; gap:20px;">
+              <button id="startRecordBtn" class="btn btn-secondary" onclick="startRecording()" style="width:100%; justify-content:center;">🎙️ Start Mic Recording</button>
+              <div class="file-upload-wrapper">
+                <input type="file" id="voiceFile" accept=".wav,.mp3,.mp4,.m4a" onchange="handleFileSelect()">
+                <label for="voiceFile" class="file-upload-label" id="fileLabel">
+                  <span class="material-icons">cloud_upload</span>
+                  <span>Upload Audio/Video</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="layout" style="grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="field">
+              <label>Spoken</label>
+              <select id="voiceSource" class="hidden-select">
+                <option value="auto">Auto Detect</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Target</label>
+              <select id="voiceTarget" class="hidden-select"></select>
+            </div>
+          </div>
+
+          <button id="voiceTranslateBtn" class="btn btn-primary" onclick="translateVoice()" style="width:100%; justify-content:center;">Process Voice</button>
+
+          <div id="voiceResult" class="result-box"></div>
+          <div id="voiceAudioContainer" style="display:none; margin-top:24px;">
+             <button id="playVoiceBtn" class="btn btn-secondary" onclick="playCustomAudio('voiceAudio', 'playVoiceBtn')" style="width:100%; justify-content:center;">▶️ Play Audio</button>
+             <audio id="voiceAudio"></audio>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="features">
+      <div class="feature-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon"><span class="material-icons">psychology</span></div>
+          <h3>Neural Engine</h3>
+          <p>Advanced NLP models ensure context-aware translations with high precision and linguistic accuracy.</p>
+        </div>
+        <div class="feature-card reveal" style="transition-delay: 0.1s;">
+          <div class="feature-icon"><span class="material-icons">graphic_eq</span></div>
+          <h3>Voice Synthesis</h3>
+          <p>Ultra-realistic AI voices that capture the natural nuance and cadence of human speech across languages.</p>
+        </div>
+        <div class="feature-card reveal" style="transition-delay: 0.2s;">
+          <div class="feature-icon"><span class="material-icons">speed</span></div>
+          <h3>Instant Detection</h3>
+          <p>Real-time language identification as you type or speak, providing a friction-less communication flow.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer reveal">
+      <div class="brand-container">
+        <div class="brand-dot"></div>
+        <div class="brand-text">VOCALIX</div>
+      </div>
+      <div class="crafted-badge">
+        Crafted by <span>Mihir</span> ❤️
+      </div>
+    </footer>
+  </main>
+
+  <div class="neural-orb" onclick="handleOrbClick()">
+    🧬
+  </div>
+
+  <script>
+    const textInput = document.getElementById("textInput");
+    const wordCounter = document.getElementById("wordCounter");
+    
+    // Netlify API Base Logic
+    function getApiBase() {
+      if (window.location.hostname.includes("netlify.app") || window.location.hostname.includes("vocalix")) {
+        return "https://vocalix-translatorapp.onrender.com";
+      }
+      return "http://127.0.0.1:8000"; 
+    }
+    const apiBase = getApiBase();
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let recordedBlob = null;
+    let isRecording = false;
+    let detectTimeout;
+    let typingTimer;
+
+    textInput.addEventListener("input", () => {
+      const wrapper = document.querySelector(".textarea-wrapper");
+      if(wrapper) {
+        wrapper.classList.remove("typing");
+        void wrapper.offsetWidth;
+        wrapper.classList.add("typing");
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => wrapper.classList.remove("typing"), 1500);
+      }
+
+      clearTimeout(detectTimeout);
+      const text = textInput.value.trim();
+      updateWordCount();
+      
+      if (text.length < 3) return;
+      
+      detectTimeout = setTimeout(async () => {
+        try {
+          const res = await fetch(`${apiBase}/detect-language?text=${encodeURIComponent(text)}`);
+          const data = await res.json();
+          if (data.code && data.code !== "auto") {
+            const sourceSelect = document.getElementById("textSource");
+            if (sourceSelect.value === "auto") {
+              const wrapper = document.querySelector(`[data-id="textSource"]`);
+              if (!wrapper) return;
+              
+              const customUI = wrapper.querySelector(".custom-select");
+              const options = wrapper.querySelector(".custom-options");
+              
+              options.classList.add("show");
+              customUI.classList.add("active");
+              customUI.style.boxShadow = "0 0 40px var(--accent-glow)";
+              
+              sourceSelect.value = data.code;
+              
+              setTimeout(() => {
+                const index = Array.from(sourceSelect.options).findIndex(o => o.value === data.code);
+                const optDiv = options.children[index];
+                
+                if(optDiv) {
+                  Array.from(options.children).forEach(c => c.classList.remove("selected"));
+                  optDiv.classList.add("selected");
+                  optDiv.scrollIntoView({ block: "nearest", behavior: "smooth" });
+                }
+                
+                customUI.innerHTML = sourceSelect.options[index].text;
+                
+                setTimeout(() => {
+                  options.classList.remove("show");
+                  customUI.classList.remove("active");
+                  customUI.style.boxShadow = "";
+                }, 1500);
+              }, 800);
+            }
+          }
+        } catch(e) {}
+      }, 600);
+    });
+
+    function handleFileSelect() {
+      const input = document.getElementById("voiceFile");
+      const label = document.getElementById("fileLabel").querySelector("span");
+      if (input.files.length > 0) {
+        const file = input.files[0];
+        label.innerText = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`;
+        label.parentElement.style.borderColor = "var(--accent)";
+        label.parentElement.style.background = "rgba(180, 255, 79, 0.05)";
+      }
+    }
+
+    function updateConsole(id, messages) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = "block";
+      el.innerHTML = messages.map(m => `<div class="status-line"><span class="status-dot-mini"></span> ${m}</div>`).join("");
+    }
+
+    function updateWordCount() {
+      const input = document.getElementById("textInput");
+      const counter = document.getElementById("wordCounter");
+      if (!input || !counter) return;
+      
+      const text = input.value;
+      const trimmed = text.trim();
+      const words = trimmed ? trimmed.split(/\s+/).length : 0;
+      counter.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+    }
+
+    async function loadLanguages() {
+      try {
+        const response = await fetch(`${apiBase}/languages`);
+        if(!response.ok) throw new Error("Backend unreachable");
+        const languages = await response.json();
+        
+        const textSource = document.getElementById("textSource");
+        const textTarget = document.getElementById("textTarget");
+        const voiceSource = document.getElementById("voiceSource");
+        const voiceTarget = document.getElementById("voiceTarget");
+        
+        [textSource, textTarget, voiceSource, voiceTarget].forEach(s => {
+          s.innerHTML = "";
+          if(s.id.includes("Source")) {
+            const optAuto = new Option("✨ Auto Detect", "auto");
+            s.add(optAuto);
+          }
+        });
+
+        Object.entries(languages).forEach(([code, data]) => {
+          let name, emoji;
+          if (Array.isArray(data)) [name, emoji] = data;
+          else { name = data; emoji = "🌐"; }
+          
+          [textSource, textTarget, voiceSource, voiceTarget].forEach(s => {
+             const opt = new Option(`${emoji} ${name}`, code);
+             s.add(opt);
+          });
+        });
+
+        textTarget.value = "hi";
+        voiceTarget.value = "hi";
+
+        ["textSource", "textTarget", "voiceSource", "voiceTarget"].forEach(setupCustomSelect);
+        populateHints("hi");
+      } catch (err) {
+        console.error("Failed to load languages", err);
+      }
+    }
+
+    function setupCustomSelect(selectId) {
+      const selectEl = document.getElementById(selectId);
+      if (!selectEl) return;
+      
+      let wrapper = document.querySelector(`[data-id="${selectId}"]`);
+      if (wrapper) wrapper.remove();
+      
+      wrapper = document.createElement("div");
+      wrapper.className = "custom-select-wrapper";
+      wrapper.setAttribute("data-id", selectId);
+      
+      const customSelect = document.createElement("div");
+      customSelect.className = "custom-select";
+      customSelect.innerHTML = selectEl.options[selectEl.selectedIndex].text;
+      
+      const optionsContainer = document.createElement("div");
+      optionsContainer.className = "custom-options";
+      
+      Array.from(selectEl.options).forEach((opt, index) => {
+        const optionDiv = document.createElement("div");
+        optionDiv.className = "custom-option";
+        optionDiv.innerHTML = opt.text;
+        if(index === selectEl.selectedIndex) optionDiv.classList.add("selected");
+        
+        optionDiv.addEventListener("click", () => {
+          selectEl.selectedIndex = index;
+          customSelect.innerHTML = opt.text;
+          Array.from(optionsContainer.children).forEach(c => c.classList.remove("selected"));
+          optionDiv.classList.add("selected");
+          optionsContainer.classList.remove("show");
+          customSelect.classList.remove("active");
+          selectEl.dispatchEvent(new Event('change'));
+        });
+        optionsContainer.appendChild(optionDiv);
+      });
+      
+      customSelect.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".custom-options").forEach(c => {
+          if(c !== optionsContainer) c.classList.remove("show");
+        });
+        optionsContainer.classList.toggle("show");
+        customSelect.classList.toggle("active");
+      });
+      
+      wrapper.appendChild(customSelect);
+      wrapper.appendChild(optionsContainer);
+      selectEl.parentNode.insertBefore(wrapper, selectEl.nextSibling);
+
+      selectEl.addEventListener('change', () => {
+        customSelect.innerHTML = selectEl.options[selectEl.selectedIndex].text;
+        if(selectId === "textTarget") populateHints(selectEl.value);
+      });
+    }
+
+    document.addEventListener("click", () => {
+      document.querySelectorAll(".custom-options").forEach(c => c.classList.remove("show"));
+      document.querySelectorAll(".custom-select").forEach(c => c.classList.remove("active"));
+    });
+
+    const languageHints = {
+      "en": [{ text: "Hello", hint: "Greeting" }, { text: "How are you", hint: "Question" }],
+      "hi": [{ text: "kya haal hai", hint: "How are you" }, { text: "namaste", hint: "Hello" }],
+      "fr": [{ text: "bonjour", hint: "Hello" }, { text: "comment ca va", hint: "How are you" }]
+    };
+
+    function populateHints(targetLang) {
+      const scrollDiv = document.getElementById("hintScroll");
+      if(!scrollDiv) return;
+      scrollDiv.innerHTML = "";
+      const hints = languageHints[targetLang] || languageHints["en"];
+      hints.forEach(h => {
+        const chip = document.createElement("div");
+        chip.className = "hint-chip";
+        chip.innerHTML = `🗣️ "${h.text}"`;
+        chip.onclick = () => {
+           document.getElementById("textInput").value = h.text;
+           translateText();
+        };
+        scrollDiv.appendChild(chip);
+      });
+    }
+
+    function setCustomAudio(containerId, audioId, base64Value) {
+      const audio = document.getElementById(audioId);
+      const container = document.getElementById(containerId);
+      audio.src = `data:audio/mpeg;base64,${base64Value}`;
+      container.style.display = "block";
+    }
+
+    function playCustomAudio(audioId, btnId) {
+      const audio = document.getElementById(audioId);
+      const btn = document.getElementById(btnId);
+      if (audio.paused) {
+        audio.play();
+        btn.innerHTML = `⏸️ Playing...`;
+      } else {
+        audio.pause();
+        btn.innerHTML = `▶️ Play Audio`;
+      }
+      audio.onended = () => { btn.innerHTML = `▶️ Play Audio`; };
+    }
+
+    function setBusy(btnId, isBusy, originalText) {
+      const btn = document.getElementById(btnId);
+      btn.disabled = isBusy;
+      btn.innerHTML = isBusy ? "Processing..." : originalText;
+    }
+
+    function showResult(elementId, text, isError = false) {
+      const el = document.getElementById(elementId);
+      el.textContent = text;
+      el.classList.add("show");
+      el.style.color = isError ? "var(--danger)" : "var(--text-main)";
+    }
+
+    async function translateText() {
+      const text = textInput.value.trim();
+      const source_lang = document.getElementById("textSource").value;
+      const target_lang = document.getElementById("textTarget").value;
+      if (!text) return;
+
+      setBusy("textTranslateBtn", true, "Translate Now");
+      updateConsole("textConsole", ["Initializing Neural Engine...", "Processing Translation..."]);
+      
+      try {
+        const response = await fetch(`${apiBase}/translate-text`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, source_lang, target_lang })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail);
+        
+        showResult("textResult", data.translated_text);
+        if (data.audio_base64) setCustomAudio("textAudioContainer", "textAudio", data.audio_base64);
+        setTimeout(() => { document.getElementById("textConsole").style.display = "none"; }, 2000);
+      } catch (err) {
+        showResult("textResult", err.message, true);
+      } finally {
+        setBusy("textTranslateBtn", false, "Translate Now");
+      }
+    }
+
+    async function translateVoice() {
+      const fileInput = document.getElementById("voiceFile");
+      const target_lang = document.getElementById("voiceTarget").value;
+      const source_lang = document.getElementById("voiceSource").value;
+      let audioFile = fileInput.files[0] || (recordedBlob ? new File([recordedBlob], "recording.wav") : null);
+
+      if (!audioFile) return;
+      setBusy("voiceTranslateBtn", true, "Process Voice");
+      updateConsole("voiceConsole", ["Listening for Signals...", "Neural Transcribing..."]);
+
+      const formData = new FormData();
+      formData.append("target_lang", target_lang);
+      formData.append("source_lang", source_lang);
+      formData.append("audio", audioFile);
+
+      try {
+        const response = await fetch(`${apiBase}/voice-translate`, { method: "POST", body: formData });
+        const data = await response.json();
+        showResult("voiceResult", data.translated_text);
+        if (data.audio_base64) setCustomAudio("voiceAudioContainer", "voiceAudio", data.audio_base64);
+        setTimeout(() => { document.getElementById("voiceConsole").style.display = "none"; }, 2000);
+      } catch (err) {
+        showResult("voiceResult", "Connection Error", true);
+      } finally {
+        setBusy("voiceTranslateBtn", false, "Process Voice");
+      }
+    }
+
+    function handleOrbClick() {
+      alert("Neural Core Synchronized.");
+    }
+
+    let audioContext, analyser, dataArray, animationId;
+    async function startRealTimeMonitor() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new AudioContext();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        analyser.fftSize = 64;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const bars = document.querySelectorAll(".pulse-bar");
+        function update() {
+          animationId = requestAnimationFrame(update);
+          analyser.getByteFrequencyData(dataArray);
+          bars.forEach((bar, i) => {
+            const val = dataArray[i % dataArray.length];
+            bar.style.height = `${Math.max(10, (val / 255) * 100)}%`;
+            bar.style.opacity = 0.5 + (val / 255) * 0.5;
+          });
+        }
+        update();
+      } catch (err) { console.error(err); }
+    }
+
+    async function startRecording() {
+      const btn = document.getElementById("startRecordBtn");
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = () => { recordedBlob = new Blob(audioChunks, { type: "audio/wav" }); btn.innerHTML = "🎙️ Audio Captured"; };
+          mediaRecorder.start();
+          isRecording = true;
+          btn.innerHTML = "⏹️ Stop Recording";
+          startRealTimeMonitor();
+        } catch(e) { alert("Mic Error"); }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        if (animationId) cancelAnimationFrame(animationId);
+        if (audioContext) audioContext.close();
+      }
+    }
+
+    function startAuroraCanvas() {
+      const canvas = document.getElementById("auroraCanvas");
+      const ctx = canvas.getContext("2d");
+      let width, height, points = [];
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        points = Array.from({length: 50}, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          speed: 0.2 + Math.random() * 0.5,
+          phase: Math.random() * Math.PI * 2
+        }));
+      }
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        points.forEach(p => {
+          p.phase += 0.01;
+          const x = p.x + Math.sin(p.phase) * 30;
+          const y = p.y + Math.cos(p.phase) * 20;
+          ctx.beginPath();
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(180, 255, 79, 0.3)";
+          ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+      window.onresize = resize;
+      resize();
+      draw();
+    }
+
+    // Scroll Reveal Logic
+    const observerOptions = { threshold: 0.1 };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      startAuroraCanvas();
+      loadLanguages();
+      document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+      
+      fetch(`${apiBase}/languages`).then(res => {
+        if(res.ok) document.querySelector('.server-online').style.opacity = '1';
+      }).catch(() => {
+        const status = document.querySelector('.server-online');
+        status.style.background = 'rgba(239, 68, 68, 0.1)';
+        status.innerHTML = '<span class="status-dot" style="background:#ef4444;"></span> OFFLINE';
+      });
+    });
+  </script>
+</body>
+</html>
