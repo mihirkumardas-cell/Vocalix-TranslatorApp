@@ -242,24 +242,22 @@ async def synthesize_speech_base64(text: str, target_lang: str) -> str:
 
 
 def transcribe_audio_file(file_bytes: bytes, filename: str) -> str:
-    suffix = Path(filename or "audio.webm").suffix.lower() or ".webm"
     temp_path = None
     converted_path = None
     try:
-        # Create a unique temp file
-        fd, temp_path = tempfile.mkstemp(suffix=suffix, dir=APP_DIR)
+        # Create a unique temp file for the raw bytes
+        fd, temp_path = tempfile.mkstemp(suffix=".raw", dir=APP_DIR)
         with os.fdopen(fd, 'wb') as tmp:
             tmp.write(file_bytes)
 
-        # Force conversion to WAV using pydub
-        # speech_recognition ONLY reliably supports WAV/AIFF/FLAC
+        # Senior Dev Tip: Use pydub to auto-detect and convert ANY format to WAV
         try:
-            audio = AudioSegment.from_file(temp_path)
+            audio = AudioSegment.from_file(io.BytesIO(file_bytes))
             converted_path = temp_path + ".wav"
             audio.export(converted_path, format="wav")
             process_path = converted_path
         except Exception as e:
-            print(f"Pydub conversion failed: {e}. Falling back to direct read.")
+            print(f"Pydub conversion failed: {e}. Trying direct read as WAV.")
             process_path = temp_path
 
         recognizer = sr.Recognizer()
@@ -269,10 +267,9 @@ def transcribe_audio_file(file_bytes: bytes, filename: str) -> str:
         return recognizer.recognize_google(audio_data)
     except Exception as exc:
         print(f"Transcription error: {exc}")
-        # If google fails, it might be silence or format
         raise HTTPException(
             status_code=422,
-            detail=f"Neural Speech recognition failed: {str(exc)}. Please check your microphone or file format.",
+            detail=f"Neural Error: Speech engine failed to decode audio. Please speak louder or check mic connection.",
         )
     finally:
         # Cleanup
