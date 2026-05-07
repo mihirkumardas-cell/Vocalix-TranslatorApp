@@ -377,14 +377,59 @@
     .file-upload-label span.material-icons { font-size: 48px; color: var(--accent); }
 
     .footer {
-      padding: 80px 0;
+      padding: 60px 0 40px;
       border-top: 1px solid var(--glass-border);
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
+      gap: 20px;
     }
-    .crafted-badge { font-weight: 700; font-size: 14px; }
-    .crafted-badge span { color: var(--accent); }
+    
+    .crafted-badge { 
+      font-weight: 700; 
+      font-size: 16px; 
+      color: var(--text-main);
+      transition: 0.3s;
+      cursor: default;
+    }
+    .crafted-badge .crafted-name { 
+      color: var(--accent); 
+      text-shadow: 0 0 10px rgba(180, 255, 79, 0);
+      transition: 0.3s;
+      font-weight: 800;
+    }
+    .crafted-badge:hover .crafted-name {
+      text-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .copyright-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #000;
+      border: 1px solid var(--glass-border);
+      padding: 10px 20px;
+      border-radius: 50px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 0 rgba(180, 255, 79, 0);
+      font-family: inherit;
+    }
+    .copyright-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+    .copyright-btn svg {
+      transition: 0.3s;
+    }
+    .copyright-btn:hover svg {
+      transform: rotate(20deg);
+    }
 
     @keyframes revealUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -541,13 +586,15 @@
     </section>
 
     <footer class="footer reveal">
-      <div class="brand-container">
-        <div class="brand-dot"></div>
-        <div class="brand-text">VOCALIX</div>
-      </div>
       <div class="crafted-badge">
-        Crafted by <span>Mihir</span> ❤️
+        Crafted by <span class="crafted-name">Mihir</span> ❤️
       </div>
+      <button class="copyright-btn" onclick="alert('Copyright © ' + new Date().getFullYear() + ' Vocalix. All rights reserved.')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Copyright © 2026 Vocalix. All rights reserved.</span>
+      </button>
     </footer>
   </main>
 
