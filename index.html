@@ -40,8 +40,10 @@
       overflow-x: hidden;
       line-height: 1.6;
       background: 
-        radial-gradient(circle at 50% -10%, rgba(180, 255, 79, 0.12), transparent 800px),
+        radial-gradient(circle at 50% 0%, rgba(180, 255, 79, 0.15), transparent 1000px),
+        radial-gradient(circle at 100% 100%, rgba(98, 242, 182, 0.05), transparent 600px),
         var(--bg-dark);
+      background-attachment: fixed;
     }
 
     /* Scroll Reveal Animation Classes */
@@ -169,8 +171,13 @@
       width: 8px; height: 8px; border-radius: 50%; 
       background: var(--accent); 
       box-shadow: 0 0 10px var(--accent);
-      animation: blink 1.5s infinite;
+      animation: blink 1s infinite;
     }
+    .heartbeat-dot {
+      width: 4px; height: 4px; border-radius: 50%; background: #ff3b30;
+      animation: heartBeat 1.2s infinite;
+    }
+    @keyframes heartBeat { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.7; } }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
     /* Hero */
@@ -556,6 +563,7 @@
     </nav>
     <div class="server-online">
       <div class="status-dot"></div>
+      <div class="heartbeat-dot"></div>
       SERVER ONLINE
     </div>
   </header>
