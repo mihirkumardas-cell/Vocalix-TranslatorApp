@@ -657,7 +657,6 @@
     const textInput = document.getElementById("textInput");
     const wordCounter = document.getElementById("wordCounter");
     
-    // Netlify API Base Logic
     function getApiBase() {
       if (window.location.hostname.includes("netlify.app") || window.location.hostname.includes("vocalix")) {
         return "https://vocalix-translatorapp.onrender.com";
@@ -734,12 +733,21 @@
 
     function handleFileSelect() {
       const input = document.getElementById("voiceFile");
-      const label = document.getElementById("fileLabel").querySelector("span");
+      const label = document.getElementById("fileLabel").querySelector("span:not(.material-icons)");
+      const wrapper = document.querySelector(".file-upload-label");
       if (input.files.length > 0) {
         const file = input.files[0];
-        label.innerText = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`;
-        label.parentElement.style.borderColor = "var(--accent)";
-        label.parentElement.style.background = "rgba(180, 255, 79, 0.05)";
+        label.innerText = `READY: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`;
+        wrapper.style.borderColor = "var(--accent)";
+        wrapper.style.background = "rgba(180, 255, 79, 0.08)";
+        wrapper.style.boxShadow = "0 0 40px var(--accent-glow)";
+        
+        // Dynamic Glow Animation
+        wrapper.animate([
+          { boxShadow: '0 0 20px var(--accent-glow)' },
+          { boxShadow: '0 0 50px var(--accent-glow)' },
+          { boxShadow: '0 0 20px var(--accent-glow)' }
+        ], { duration: 2000, iterations: Infinity });
       }
     }
 
@@ -949,11 +957,15 @@
       const fileInput = document.getElementById("voiceFile");
       const target_lang = document.getElementById("voiceTarget").value;
       const source_lang = document.getElementById("voiceSource").value;
-      let audioFile = fileInput.files[0] || (recordedBlob ? new File([recordedBlob], "recording.wav") : null);
+      let audioFile = fileInput.files[0] || (recordedBlob ? new File([recordedBlob], "recording.webm", { type: "audio/webm" }) : null);
 
-      if (!audioFile) return;
-      setBusy("voiceTranslateBtn", true, "Process Voice");
-      updateConsole("voiceConsole", ["Listening for Signals...", "Neural Transcribing..."]);
+      if (!audioFile) {
+        alert("Please record or select a file first.");
+        return;
+      }
+      
+      setBusy("voiceTranslateBtn", true, "Neural Processing...");
+      updateConsole("voiceConsole", ["Connecting to Neural Core...", "Decoding Audio Stream...", "Transcribing..."]);
 
       const formData = new FormData();
       formData.append("target_lang", target_lang);
@@ -963,11 +975,19 @@
       try {
         const response = await fetch(`${apiBase}/voice-translate`, { method: "POST", body: formData });
         const data = await response.json();
-        showResult("voiceResult", data.translated_text);
-        if (data.audio_base64) setCustomAudio("voiceAudioContainer", "voiceAudio", data.audio_base64);
+        
+        if (!response.ok) throw new Error(data.detail || "Neural Engine Error");
+        
+        if (!data.translated_text) {
+          showResult("voiceResult", "Could not understand audio. Try speaking clearer.", true);
+        } else {
+          showResult("voiceResult", data.translated_text);
+          if (data.audio_base64) setCustomAudio("voiceAudioContainer", "voiceAudio", data.audio_base64);
+        }
         setTimeout(() => { document.getElementById("voiceConsole").style.display = "none"; }, 2000);
       } catch (err) {
-        showResult("voiceResult", "Connection Error", true);
+        console.error("Voice Processing Error:", err);
+        showResult("voiceResult", "Neural Error: " + err.message, true);
       } finally {
         setBusy("voiceTranslateBtn", false, "Process Voice");
       }
@@ -1006,18 +1026,30 @@
       if (!isRecording) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
+          const options = { mimeType: 'audio/webm' };
+          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+             options.mimeType = 'audio/mp4';
+          }
+          
+          mediaRecorder = new MediaRecorder(stream, options);
           audioChunks = [];
-          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-          mediaRecorder.onstop = () => { recordedBlob = new Blob(audioChunks, { type: "audio/wav" }); btn.innerHTML = "🎙️ Audio Captured"; };
+          mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+          mediaRecorder.onstop = () => { 
+             recordedBlob = new Blob(audioChunks, { type: options.mimeType }); 
+             btn.innerHTML = "🎙️ Neural Audio Captured"; 
+             btn.style.borderColor = "var(--accent)";
+             btn.style.boxShadow = "0 0 20px var(--accent-glow)";
+          };
           mediaRecorder.start();
           isRecording = true;
-          btn.innerHTML = "⏹️ Stop Recording";
+          btn.innerHTML = "⏹️ Recording Pulse...";
+          btn.style.background = "rgba(239, 68, 68, 0.1)";
           startRealTimeMonitor();
-        } catch(e) { alert("Mic Error"); }
+        } catch(e) { console.error(e); alert("Mic Access Denied or Error."); }
       } else {
         mediaRecorder.stop();
         isRecording = false;
+        btn.style.background = "";
         if (animationId) cancelAnimationFrame(animationId);
         if (audioContext) audioContext.close();
       }
