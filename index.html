@@ -175,9 +175,10 @@
     }
     .heartbeat-dot {
       width: 4px; height: 4px; border-radius: 50%; background: #ff3b30;
-      animation: heartBeat 1.2s infinite;
+      box-shadow: 0 0 8px #ff3b30;
+      animation: heartBeat 0.8s infinite;
     }
-    @keyframes heartBeat { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.7; } }
+    @keyframes heartBeat { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.8); opacity: 0.6; } }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
     /* Hero */
@@ -1060,7 +1061,7 @@
       const fileInput = document.getElementById("voiceFile");
       const target_lang = document.getElementById("voiceTarget").value;
       const source_lang = document.getElementById("voiceSource").value;
-      let audioFile = fileInput.files[0] || (recordedBlob ? new File([recordedBlob], "recording.webm", { type: "audio/webm" }) : null);
+      let audioFile = fileInput.files[0] || (recordedBlob ? new File([recordedBlob], "recording.wav", { type: "audio/wav" }) : null);
 
       if (!audioFile) {
         alert("Please record or select a file first.");
@@ -1068,7 +1069,7 @@
       }
       
       setBusy("voiceTranslateBtn", true, "Neural Processing...");
-      updateConsole("voiceConsole", ["Connecting to Neural Core...", "Decoding Audio Stream...", "Transcribing..."]);
+      updateConsole("voiceConsole", ["Establishing Secure Link...", "Decoding PCM Stream...", "Neural Transcribing..."]);
 
       const formData = new FormData();
       formData.append("target_lang", target_lang);
@@ -1082,7 +1083,7 @@
         if (!response.ok) throw new Error(data.detail || "Neural Engine Error");
         
         if (!data.translated_text) {
-          showResult("voiceResult", "Could not understand audio. Try speaking clearer.", true);
+          showResult("voiceResult", "Signal too weak. Try speaking clearer.", true);
         } else {
           showResult("voiceResult", data.translated_text);
           if (data.audio_base64) setCustomAudio("voiceAudioContainer", "voiceAudio", data.audio_base64);
@@ -1094,6 +1095,36 @@
       } finally {
         setBusy("voiceTranslateBtn", false, "Process Voice");
       }
+    }
+
+    // Senior Developer Fix: Frontend WAV Encoder
+    function encodeWAV(samples, sampleRate) {
+      let buffer = new ArrayBuffer(44 + samples.length * 2);
+      let view = new DataView(buffer);
+      function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      }
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, 32 + samples.length * 2, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, samples.length * 2, true);
+      let index = 44;
+      for (let i = 0; i < samples.length; i++, index += 2) {
+        let s = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(index, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+      return new Blob([view], { type: 'audio/wav' });
     }
 
     function handleOrbClick() {
@@ -1129,32 +1160,48 @@
       if (!isRecording) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          const options = { mimeType: 'audio/webm' };
-          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-             options.mimeType = 'audio/mp4';
-          }
-          
-          mediaRecorder = new MediaRecorder(stream, options);
-          audioChunks = [];
-          mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-          mediaRecorder.onstop = () => { 
-             recordedBlob = new Blob(audioChunks, { type: options.mimeType }); 
-             btn.innerHTML = "🎙️ Neural Audio Captured"; 
-             btn.style.borderColor = "var(--accent)";
-             btn.style.boxShadow = "0 0 20px var(--accent-glow)";
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const source = audioCtx.createMediaStreamSource(stream);
+          const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+          let samples = [];
+
+          processor.onaudioprocess = (e) => {
+            if (!isRecording) return;
+            const inputData = e.inputBuffer.getChannelData(0);
+            samples.push(...inputData);
           };
-          mediaRecorder.start();
+
+          source.connect(processor);
+          processor.connect(audioCtx.destination);
+
           isRecording = true;
           btn.innerHTML = "⏹️ Recording Pulse...";
-          btn.style.background = "rgba(239, 68, 68, 0.1)";
+          btn.style.background = "rgba(255, 59, 48, 0.15)";
+          btn.style.borderColor = "#ff3b30";
+          btn.style.boxShadow = "0 0 25px rgba(255, 59, 48, 0.4)";
+          
           startRealTimeMonitor();
+          
+          // Store for stopping
+          window.micStream = stream;
+          window.audioCtx = audioCtx;
+          window.audioSamples = samples;
+
         } catch(e) { console.error(e); alert("Mic Access Denied or Error."); }
       } else {
-        mediaRecorder.stop();
         isRecording = false;
         btn.style.background = "";
+        btn.style.borderColor = "";
+        btn.style.boxShadow = "";
+        btn.innerHTML = "🎙️ Neural Audio Captured";
+        
+        // Finalize WAV
+        const blob = encodeWAV(window.audioSamples, window.audioCtx.sampleRate);
+        recordedBlob = blob;
+
+        if (window.micStream) window.micStream.getTracks().forEach(t => t.stop());
+        if (window.audioCtx) window.audioCtx.close();
         if (animationId) cancelAnimationFrame(animationId);
-        if (audioContext) audioContext.close();
       }
     }
 
