@@ -242,51 +242,44 @@ async def synthesize_speech_base64(text: str, target_lang: str) -> str:
 
 
 def transcribe_audio_file(file_bytes: bytes, filename: str) -> str:
-    suffix = Path(filename or "audio.wav").suffix.lower() or ".wav"
+    suffix = Path(filename or "audio.webm").suffix.lower() or ".webm"
     temp_path = None
     converted_path = None
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, dir=APP_DIR) as temp_file:
-            temp_file.write(file_bytes)
-            temp_path = temp_file.name
+        # Create a unique temp file
+        fd, temp_path = tempfile.mkstemp(suffix=suffix, dir=APP_DIR)
+        with os.fdopen(fd, 'wb') as tmp:
+            tmp.write(file_bytes)
 
-        # Conversion for MP3/MP4/etc.
-        if suffix in [".mp3", ".mp4", ".m4a", ".ogg", ".webm"]:
-            try:
-                audio = AudioSegment.from_file(temp_path)
-                converted_path = temp_path + ".wav"
-                audio.export(converted_path, format="wav")
-                process_path = converted_path
-            except Exception as e:
-                print(f"Pydub conversion failed: {e}. Falling back to direct read.")
-                process_path = temp_path
-        else:
+        # Force conversion to WAV using pydub
+        # speech_recognition ONLY reliably supports WAV/AIFF/FLAC
+        try:
+            audio = AudioSegment.from_file(temp_path)
+            converted_path = temp_path + ".wav"
+            audio.export(converted_path, format="wav")
+            process_path = converted_path
+        except Exception as e:
+            print(f"Pydub conversion failed: {e}. Falling back to direct read.")
             process_path = temp_path
 
         recognizer = sr.Recognizer()
-        # Adjusted for better understanding
-        recognizer.energy_threshold = 300 
-        recognizer.dynamic_energy_threshold = True
-        
         with sr.AudioFile(process_path) as source:
-            # Record with slight offset to avoid cutting off
             audio_data = recognizer.record(source)
             
         return recognizer.recognize_google(audio_data)
     except Exception as exc:
         print(f"Transcription error: {exc}")
+        # If google fails, it might be silence or format
         raise HTTPException(
             status_code=422,
-            detail=f"Speech recognition failed: {str(exc)}",
+            detail=f"Neural Speech recognition failed: {str(exc)}. Please check your microphone or file format.",
         )
     finally:
         # Cleanup
         for p in [temp_path, converted_path]:
             if p and os.path.exists(p):
-                try:
-                    os.remove(p)
-                except Exception:
-                    pass
+                try: os.remove(p)
+                except: pass
 
 
 def pick_available_port(preferred_port: int = 8000) -> int:
