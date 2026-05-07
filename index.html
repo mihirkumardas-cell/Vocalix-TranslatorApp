@@ -382,24 +382,37 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
     }
     
     .crafted-badge { 
-      font-weight: 700; 
+      font-weight: 500; 
       font-size: 16px; 
       color: var(--text-main);
-      transition: 0.3s;
+      padding: 10px 20px;
+      border-radius: 100px;
+      transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       cursor: default;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.01em;
+    }
+    .crafted-badge:hover {
+      background: rgba(255, 255, 255, 0.03);
+      box-shadow: 0 0 40px var(--accent-glow);
+      transform: translateY(-3px) scale(1.02);
     }
     .crafted-badge .crafted-name { 
       color: var(--accent); 
-      text-shadow: 0 0 10px rgba(180, 255, 79, 0);
-      transition: 0.3s;
-      font-weight: 800;
+      font-weight: 700;
     }
-    .crafted-badge:hover .crafted-name {
-      text-shadow: 0 0 15px var(--accent-glow);
+    .heart-svg {
+      width: 18px;
+      height: 18px;
+      fill: #ff3b30; /* Apple Red */
+      filter: drop-shadow(0 0 5px rgba(255, 59, 48, 0.4));
     }
 
     .copyright-btn {
@@ -408,27 +421,21 @@
       gap: 8px;
       background: #000;
       border: 1px solid var(--glass-border);
-      padding: 10px 20px;
+      padding: 8px 18px;
       border-radius: 50px;
       color: var(--text-muted);
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 400;
       cursor: pointer;
-      transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 0 0 rgba(180, 255, 79, 0);
+      transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       font-family: inherit;
     }
     .copyright-btn:hover {
       border-color: var(--accent);
       color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
+      box-shadow: 0 0 30px var(--accent-glow);
       transform: translateY(-2px);
-    }
-    .copyright-btn svg {
-      transition: 0.3s;
-    }
-    .copyright-btn:hover svg {
-      transform: rotate(20deg);
+      background: rgba(180, 255, 79, 0.05);
     }
 
     @keyframes revealUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -587,7 +594,10 @@
 
     <footer class="footer reveal">
       <div class="crafted-badge">
-        Crafted by <span class="crafted-name">Mihir</span> ❤️
+        Crafted by <span class="crafted-name">Mihir</span>
+        <svg class="heart-svg" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
       </div>
       <button class="copyright-btn" onclick="alert('Copyright © ' + new Date().getFullYear() + ' Vocalix. All rights reserved.')">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
